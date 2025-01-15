@@ -1,6 +1,6 @@
 {
   "bot-account": {
-    "username": "BinodOP69", 
+    "username": "%botname%", 
     "password": "",
     "type": "mojang"
   },
