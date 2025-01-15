@@ -12,15 +12,14 @@ app.get('/', (req, res) => {
   res.send('Bot has arrived');
 });
 
-const PORT = process.env.PORT || 8000; // Use AWS-assigned port or default to 8000
+const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);
 });
 
-
-function createBot() {
+function createBot(username) {
    const bot = mineflayer.createBot({
-      username: config['bot-account']['username'],
+      username: username, // Set the username dynamically
       password: config['bot-account']['password'],
       auth: config['bot-account']['type'],
       host: config.server.ip,
@@ -31,7 +30,7 @@ function createBot() {
    bot.loadPlugin(pathfinder);
    const mcData = require('minecraft-data')(bot.version);
    const defaultMove = new Movements(bot, mcData);
-   bot.settings.colorsEnabled = true;
+   bot.settings.colorsEnabled = false;
 
    let pendingPromise = Promise.resolve();
 
@@ -41,17 +40,14 @@ function createBot() {
          console.log(`[Auth] Sent /register command.`);
 
          bot.once('chat', (username, message) => {
-            console.log(`[ChatLog] <${username}> ${message}`); // Log all chat messages
+            console.log(`[ChatLog] <${username}> ${message}`);
 
-            // Check for various possible responses
             if (message.includes('successfully registered')) {
                console.log('[INFO] Registration confirmed.');
                resolve();
             } else if (message.includes('already registered')) {
                console.log('[INFO] Bot was already registered.');
-               resolve(); // Resolve if already registered
-            } else if (message.includes('Invalid command')) {
-               reject(`Registration failed: Invalid command. Message: "${message}"`);
+               resolve();
             } else {
                reject(`Registration failed: unexpected message "${message}".`);
             }
@@ -65,15 +61,11 @@ function createBot() {
          console.log(`[Auth] Sent /login command.`);
 
          bot.once('chat', (username, message) => {
-            console.log(`[ChatLog] <${username}> ${message}`); // Log all chat messages
+            console.log(`[ChatLog] <${username}> ${message}`);
 
             if (message.includes('successfully logged in')) {
                console.log('[INFO] Login successful.');
                resolve();
-            } else if (message.includes('Invalid password')) {
-               reject(`Login failed: Invalid password. Message: "${message}"`);
-            } else if (message.includes('not registered')) {
-               reject(`Login failed: Not registered. Message: "${message}"`);
             } else {
                reject(`Login failed: unexpected message "${message}".`);
             }
@@ -86,7 +78,6 @@ function createBot() {
 
       if (config.utils['auto-auth'].enabled) {
          console.log('[INFO] Started auto-auth module');
-
          const password = config.utils['auto-auth'].password;
 
          pendingPromise = pendingPromise
@@ -153,7 +144,7 @@ function createBot() {
    if (config.utils['auto-reconnect']) {
       bot.on('end', () => {
          setTimeout(() => {
-            createBot();
+            createBot(config['bot-account']['username']); // Restart bot with the same username
          }, config.utils['auto-recconect-delay']);
       });
    }
@@ -171,4 +162,22 @@ function createBot() {
    );
 }
 
-createBot();
+// Function to cycle through the 7 bot names
+let nameIndex = 0;
+const botNames = ["BinodTharu69", "DogeBhaiOP", "LolCatBoiii", "mangalSingh", "chotabheem", "Doraemon687", "dillikalaunda"];
+
+function getNextBotName() {
+   const name = botNames[nameIndex];
+   nameIndex = (nameIndex + 1) % botNames.length; // Cycle through names
+   return name;
+}
+
+// Initial bot creation with the first name
+createBot(getNextBotName());
+
+// Change bot's username every 2 hours (7200000 ms)
+setInterval(() => {
+   const newUsername = getNextBotName();
+   console.log(`[INFO] Changing bot's name to: ${newUsername}`);
+   createBot(newUsername); // Restart the bot with a new name
+}, 7200000); // 2 hours in milliseconds
