@@ -1,9 +1,0 @@
-{"error":".zip archives do not support non-regular files","level":"error","msg":"unable to write file .cache/replit/modules/replit","time":"2025-01-15T12:30:21Z"}
-{"error":".zip archives do not support non-regular files","level":"error","msg":"unable to write file node_modules/.bin/mime","time":"2025-01-15T12:30:21Z"}
-{"error":".zip archives do not support non-regular files","level":"error","msg":"unable to write file node_modules/.bin/nearley-railroad","time":"2025-01-15T12:30:21Z"}
-{"error":".zip archives do not support non-regular files","level":"error","msg":"unable to write file node_modules/.bin/nearley-test","time":"2025-01-15T12:30:21Z"}
-{"error":".zip archives do not support non-regular files","level":"error","msg":"unable to write file node_modules/.bin/nearley-unparse","time":"2025-01-15T12:30:21Z"}
-{"error":".zip archives do not support non-regular files","level":"error","msg":"unable to write file node_modules/.bin/nearleyc","time":"2025-01-15T12:30:21Z"}
-{"error":".zip archives do not support non-regular files","level":"error","msg":"unable to write file node_modules/.bin/protodef-validator","time":"2025-01-15T12:30:21Z"}
-{"error":".zip archives do not support non-regular files","level":"error","msg":"unable to write file node_modules/.bin/semver","time":"2025-01-15T12:30:21Z"}
-{"error":".zip archives do not support non-regular files","level":"error","msg":"unable to write file node_modules/.bin/uuid","time":"2025-01-15T12:30:21Z"}
