@@ -22,7 +22,7 @@ Head to the `settings.json` file and  put your server IP and port here
 ```json
   "server": {
     "ip": "<YOUR SERVER IP>", 
-    "port": 25565,  //Change this to your port
+    "port": 25565,
     "version": "1.12.1"   
   },
 ```
