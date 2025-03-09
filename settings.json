@@ -1,13 +1,13 @@
 {
   "bot-account": {
-    "username": "BinodOP69", 
+    "username": "Don't Change This", 
     "password": "",
     "type": "mojang"
   },
 
   "server": {
-    "ip": "ElysiumReloaded.aternos.me", 
-    "port": 27348,   
+    "ip": "<YOUR SERVER IP>", 
+    "port": <YOUR SERVER PORT>,   
     "version": "1.12.1"   
   },
   
@@ -35,9 +35,9 @@
       "repeat-delay": 60,
 
       "messages": [
-        "Elysium",
-        "Gimme dirt",
-        "I Like to Play Minecraft"
+        "message1",
+        "message2",
+        "message3"
       ]
     },
 
