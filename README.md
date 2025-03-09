@@ -1,45 +1,81 @@
-# Afk Bot
+# MineAFKjs
 <p align="center"> 
-    <img src="https://img.shields.io/github/issues/urfate/afk-bot">
-    <img src="https://img.shields.io/github/forks/urfate/afk-bot">
-    <img src="https://img.shields.io/github/stars/urfate/afk-bot">
-    <img src="https://img.shields.io/github/license/urfate/afk-bot">
-</p>
+    <img src="https://img.shields.io/github/issues/yashbos5620x/MineAFKjs">
+    <img src="https://img.shields.io/github/forks/yashbos5620x/MineAFKjs">
+    <img src="https://img.shields.io/github/stars/yashbos5620x/MineAFKjs">
+    <img src="https://img.shields.io/github/license/yashbos5620x/MineAFKjs">
 
-<p align="center">
-    Functional minecraft AFK bot for servers
-</p>
 
-<p align="center">
-    Anti-AFK, Auto-Auth, Microsoft/Offline accounts support.
-</p>
-
-## Tutorial
-
-1. Please Watch This Quick 3 Minute Video [HERE](https://www.youtube.com/watch?v=92khf57AfpE) And Consider Subscribing.
-2. For Any Questions Please Join My Discord Server And Create a Ticket. [HERE](https://discord.gg/MgfBNqxSA9)
-3. Fork The Code by pressing on the top Right.
-4. Like the Code So I can Keep Updating it!
+MineAFKjs is a JavaScript tool used to create a bot using Mineflayer that joins your server.
 
 ## Installation
 
- 1. [Download](https://github.com/urFate/Afk-Bot/tags) the latest package.
- 2. Download & install [Node.JS](https://nodejs.org/en/download/)
- 3. Run `npm install` command in bot directory.
- 
- ## Usage
- 
- 1. Configure bot in `settings.json` file. [Bot configuration is explained in our wiki](https://urfate.gitbook.io/afk-bot/bot-configuration)
- 2. Start bot with `node .` command.
+Install  [Node.js](https://nodejs.org/en). and run the below command in Terminal of your Folder
+```
+npm install requirements
+```
 
-## Features
+## Usage
 
- - Anti-AFK Kick Module
- - Move to target block after join
- - Mojang/Microsoft Account support
- - Chat log
- - Chat messages Module
- - Auto reconnect
- - Authentication with Login Security [HERE](https://aternos.org/addons/a/spigot/19362) (Authentication Plugin For Cracked Servers)
- - Supported server versions: `1.8 - 1.21.3`
+Head to the `settings.json` file and  put your server IP and port here
 
+```json
+  "server": {
+    "ip": "<YOUR SERVER IP>", 
+    "port": <YOUR SERVER PORT>,   
+    "version": "1.12.1"   
+  },
+```
+Do not change the version no matter what.
+
+After configuring the `settings.json`, you can run the following command in the Terminal to start the bot and make it join.
+
+```bash
+node index.js
+```
+
+The bot should join the server.
+
+## Customization
+
+1. **Name Customization:** 
+To customize the name of the bot head to `index.js` (Line 8) and replace ``username1``, ``username2``and ``username3`` with the names you want. It cycles between these names every time the bot joins the server. 
+
+```javascript
+const usernames = ["username1", "username2", "username3"];
+```
+2. **Path Finder:** To enable pathfinder go to `settings.json` and change enabled to true in position and enter the X, Y, Z coordinates of the destination to path find.
+```json
+  "position": {
+    "enabled": true,
+    "x": 69,
+    "y": 69,
+    "z": 69
+  },
+```
+3. **Messages:** To customize messages sent by the bot in the server, go to `settings.json` and put your messages here
+
+```json
+      "messages": [
+        "message1",
+        "message2",
+        "message3"
+      ]
+    },
+```
+4. **AUTH:** WORK IN PROGRESS*
+
+
+
+## Contributing
+
+Pull requests are welcome. For major changes, please open an issue first
+to discuss what you would like to change.
+
+Please make sure to update tests as appropriate.
+
+This is a premature project that I made for my use so it may be a bit too specific, i would suggest using ai tools to edit this according to your usage incase you are a beginner.
+
+## License
+
+[MIT](https://choosealicense.com/licenses/mit/)
