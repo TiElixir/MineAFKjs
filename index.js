@@ -1,174 +1,98 @@
 const mineflayer = require('mineflayer');
-const Movements = require('mineflayer-pathfinder').Movements;
-const pathfinder = require('mineflayer-pathfinder').pathfinder;
-const { GoalBlock } = require('mineflayer-pathfinder').goals;
-
-const config = require('./settings.json');
+const { Movements, pathfinder, goals: { GoalBlock } } = require('mineflayer-pathfinder');
+const fs = require('fs');
 const express = require('express');
+const readline = require('readline');
+const config = require('./settings.json');
+
+const usernames = ["username1", "username2", "username3"];   //you can add more usernames in this list
+const filename = "lastIndex.dat";
+
+function getNextUsername() {
+    let lastIndex = fs.existsSync(filename) ? parseInt(fs.readFileSync(filename, "utf8")) || 0 : 0;
+    const username = usernames[lastIndex];
+    fs.writeFileSync(filename, ((lastIndex + 1) % usernames.length).toString());
+    return username;
+}
+
+//stores the current index in a txt file so that it cycles when it boots up next time.
+
+let bot = null;
+let autoReconnectEnabled = config.utils['auto-reconnect'];
+let botStatus = 'Offline';
+const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 
 const app = express();
 
-app.get('/', (req, res) => {
-  res.send('Bot has arrived');
-});
-
-const PORT = process.env.PORT || 8000; // Use AWS-assigned port or default to 8000
-app.listen(PORT, () => {
-  console.log(`Server started on port ${PORT}`);
-});
-
-
 function createBot() {
-   const bot = mineflayer.createBot({
-      username: config['bot-account']['username'],
-      password: config['bot-account']['password'],
-      auth: config['bot-account']['type'],
-      host: config.server.ip,
-      port: config.server.port,
-      version: config.server.version,
-   });
+    const username = getNextUsername();
+    bot = mineflayer.createBot({
+        username,
+        password: config['bot-account']['password'],
+        auth: config['bot-account']['type'],
+        host: config.server.ip,
+        port: config.server.port,
+        version: config.server.version,
+    });
 
-   bot.loadPlugin(pathfinder);
-   const mcData = require('minecraft-data')(bot.version);
-   const defaultMove = new Movements(bot, mcData);
-   bot.settings.colorsEnabled = true;
+    bot.loadPlugin(pathfinder);
+    const mcData = require('minecraft-data')(bot.version);
+    const defaultMove = new Movements(bot, mcData);
+    defaultMove.canDig = false; // Prevents breaking blocks while pathfinding
+    bot.settings.colorsEnabled = false;
 
-   let pendingPromise = Promise.resolve();
+    bot.once('spawn', () => {
+        console.log('\x1b[32m[AfkBot]\x1b[0m', `${username} joined the server.`);
+        botStatus = 'Joined';
 
-   function sendRegister(password) {
-      return new Promise((resolve, reject) => {
-         bot.chat(`/register ${password} ${password}`);
-         console.log(`[Auth] Sent /register command.`);
+        if (config.utils['auto-auth'].enabled) {
+            bot.chat(`/login ${config.utils['auto-auth'].password}`);
+        }
+        setTimeout(() => bot.setControlState('jump', true), 8000); //You can customise this, i'm using this just bcs it fits my usage case.
+        setTimeout(() => bot.setControlState('sneak', true), 1000); //You can customise this, i'm using this just bcs it fits my usage case.
 
-         bot.once('chat', (username, message) => {
-            console.log(`[ChatLog] <${username}> ${message}`); // Log all chat messages
+        if (config.position.enabled) {
+            console.log('\x1b[34m[AfkBot]\x1b[0m', `Moving to target (${config.position.x}, ${config.position.y}, ${config.position.z})`);
+            bot.pathfinder.setMovements(defaultMove);
+            bot.pathfinder.setGoal(new GoalBlock(config.position.x, config.position.y, config.position.z));
+        }
+    });
 
-            // Check for various possible responses
-            if (message.includes('successfully registered')) {
-               console.log('[INFO] Registration confirmed.');
-               resolve();
-            } else if (message.includes('already registered')) {
-               console.log('[INFO] Bot was already registered.');
-               resolve(); // Resolve if already registered
-            } else if (message.includes('Invalid command')) {
-               reject(`Registration failed: Invalid command. Message: "${message}"`);
-            } else {
-               reject(`Registration failed: unexpected message "${message}".`);
+    bot.on('goal_reached', () => {
+        console.log('\x1b[32m[AfkBot]\x1b[0m', 'Bot reached the target location, starting to jump.');
+        setTimeout(() => {
+            bot.setControlState('jump', true);
+            setInterval(() => {
+                bot.setControlState('jump', false);
+                setTimeout(() => bot.setControlState('jump', true), 200);//You can customise this, i'm using this just bcs it fits my usage case.
+                setTimeout(() => bot.setControlState('sneak', true), 200);//You can customise this, i'm using this just bcs it fits my usage case.
+                
+            }, 1000);
+        }, 500); // Ensure jumping starts after reaching location
+    });
+
+    bot.on('death', () => {
+        console.log('\x1b[31m[AfkBot]\x1b[0m', `${username} died and respawned.`);
+        setTimeout(() => bot.setControlState('jump', false), 200); //Line1
+        setTimeout(() => bot.setControlState('sneak', false), 200);//Line2
+        setTimeout(() => {
+            if (config.position.enabled) {
+                console.log('\x1b[34m[AfkBot]\x1b[0m', `Re-pathfinding to target (${config.position.x}, ${config.position.y}, ${config.position.z})`);
+                bot.pathfinder.setMovements(defaultMove);
+                bot.pathfinder.setGoal(new GoalBlock(config.position.x, config.position.y, config.position.z));
             }
-         });
-      });
-   }
+        }, 2000);
+    });
+	//This is setup so that it stops Jumping and Crouching state, so that is can pathfind to the destination properly
+	//The jumping and the crouching is then re-enabled in the bot.on(goal_reached) function above...
+	//You can completely delete these the Line1 and Line2 if you arent using pathfinding.
 
-   function sendLogin(password) {
-      return new Promise((resolve, reject) => {
-         bot.chat(`/login ${password}`);
-         console.log(`[Auth] Sent /login command.`);
-
-         bot.once('chat', (username, message) => {
-            console.log(`[ChatLog] <${username}> ${message}`); // Log all chat messages
-
-            if (message.includes('successfully logged in')) {
-               console.log('[INFO] Login successful.');
-               resolve();
-            } else if (message.includes('Invalid password')) {
-               reject(`Login failed: Invalid password. Message: "${message}"`);
-            } else if (message.includes('not registered')) {
-               reject(`Login failed: Not registered. Message: "${message}"`);
-            } else {
-               reject(`Login failed: unexpected message "${message}".`);
-            }
-         });
-      });
-   }
-
-   bot.once('spawn', () => {
-      console.log('\x1b[33m[AfkBot] Bot joined the server', '\x1b[0m');
-
-      if (config.utils['auto-auth'].enabled) {
-         console.log('[INFO] Started auto-auth module');
-
-         const password = config.utils['auto-auth'].password;
-
-         pendingPromise = pendingPromise
-            .then(() => sendRegister(password))
-            .then(() => sendLogin(password))
-            .catch(error => console.error('[ERROR]', error));
-      }
-
-      if (config.utils['chat-messages'].enabled) {
-         console.log('[INFO] Started chat-messages module');
-         const messages = config.utils['chat-messages']['messages'];
-
-         if (config.utils['chat-messages'].repeat) {
-            const delay = config.utils['chat-messages']['repeat-delay'];
-            let i = 0;
-
-            let msg_timer = setInterval(() => {
-               bot.chat(`${messages[i]}`);
-
-               if (i + 1 === messages.length) {
-                  i = 0;
-               } else {
-                  i++;
-               }
-            }, delay * 1000);
-         } else {
-            messages.forEach((msg) => {
-               bot.chat(msg);
-            });
-         }
-      }
-
-      const pos = config.position;
-
-      if (config.position.enabled) {
-         console.log(
-            `\x1b[32m[Afk Bot] Starting to move to target location (${pos.x}, ${pos.y}, ${pos.z})\x1b[0m`
-         );
-         bot.pathfinder.setMovements(defaultMove);
-         bot.pathfinder.setGoal(new GoalBlock(pos.x, pos.y, pos.z));
-      }
-
-      if (config.utils['anti-afk'].enabled) {
-         bot.setControlState('jump', true);
-         if (config.utils['anti-afk'].sneak) {
-            bot.setControlState('sneak', true);
-         }
-      }
-   });
-
-   bot.on('goal_reached', () => {
-      console.log(
-         `\x1b[32m[AfkBot] Bot arrived at the target location. ${bot.entity.position}\x1b[0m`
-      );
-   });
-
-   bot.on('death', () => {
-      console.log(
-         `\x1b[33m[AfkBot] Bot has died and was respawned at ${bot.entity.position}`,
-         '\x1b[0m'
-      );
-   });
-
-   if (config.utils['auto-reconnect']) {
-      bot.on('end', () => {
-         setTimeout(() => {
-            createBot();
-         }, config.utils['auto-recconect-delay']);
-      });
-   }
-
-   bot.on('kicked', (reason) =>
-      console.log(
-         '\x1b[33m',
-         `[AfkBot] Bot was kicked from the server. Reason: \n${reason}`,
-         '\x1b[0m'
-      )
-   );
-
-   bot.on('error', (err) =>
-      console.log(`\x1b[31m[ERROR] ${err.message}`, '\x1b[0m')
-   );
+    bot.on('kicked', reason => console.log('\x1b[33m[AfkBot]\x1b[0m', `Kicked: ${reason}`));
+    bot.on('end', () => {
+        console.log('\x1b[31m[AfkBot]\x1b[0m', `Bot disconnected.`);
+        botStatus = 'Offline';
+        if (autoReconnectEnabled) setTimeout(createBot, config.utils['auto-reconnect-delay']);
+    });
 }
 
 createBot();
