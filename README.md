@@ -22,7 +22,7 @@ Head to the `settings.json` file and  put your server IP and port here
 ```json
   "server": {
     "ip": "<YOUR SERVER IP>", 
-    "port": <YOUR SERVER PORT>,   
+    "port": 25565,  //Change this to your port
     "version": "1.12.1"   
   },
 ```
@@ -61,7 +61,6 @@ const usernames = ["username1", "username2", "username3"];
         "message2",
         "message3"
       ]
-    },
 ```
 4. **AUTH:** WORK IN PROGRESS*
 
