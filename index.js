@@ -96,3 +96,4 @@ function createBot() {
 }
 
 createBot();
+//END
