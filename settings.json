@@ -7,7 +7,7 @@
 
   "server": {
     "ip": "<YOUR SERVER IP>", 
-    "port": <YOUR SERVER PORT>,   
+    "port": 25565, 
     "version": "1.12.1"   
   },
   
