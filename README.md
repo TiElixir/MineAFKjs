@@ -64,8 +64,8 @@ const usernames = ["username1", "username2", "username3"];
 ```
 4. **AUTH:** WORK IN PROGRESS*
 
-<font color="red"> IMPORTANT* </font>
-<font color="red">You might need ViaRewind and ViaVersion plugins so that the bot can join from an older version</font>
+## IMPORTANT*
+You might need ViaRewind and ViaVersion plugins so that the bot can join from an older version
 
 ## Contributing
 
