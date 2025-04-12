@@ -80,7 +80,9 @@ function createBot() {
                 console.log('\x1b[34m[AfkBot]\x1b[0m', `Re-pathfinding to target (${config.position.x}, ${config.position.y}, ${config.position.z})`);
                 bot.pathfinder.setMovements(defaultMove);
                 bot.pathfinder.setGoal(new GoalBlock(config.position.x, config.position.y, config.position.z));
-            }
+            } else {
+        setTimeout(() => bot.setControlState('jump', true), 200); //Line1
+        setTimeout(() => bot.setControlState('sneak', true), 200);}//Line2
         }, 2000);
     });
 	//This is setup so that it stops Jumping and Crouching state, so that is can pathfind to the destination properly
