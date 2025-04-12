@@ -8,6 +8,8 @@
 
 MineAFKjs is a JavaScript tool used to create a bot using Mineflayer that joins your server.
 
+ATERNOS BOT, ATERNOS AFK BOT
+
 ## Installation
 
 Install  [Node.js](https://nodejs.org/en). and run the below command in Terminal of your Folder
