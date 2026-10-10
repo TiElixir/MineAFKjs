@@ -1,8 +1,8 @@
 {
   "bot-account": {
-    "username": "Don't Change This", 
+    "usernames": ["TiElixirBot"],
     "password": "",
-    "type": "mojang"
+    "type": "offline"
   },
 
   "server": {
@@ -43,6 +43,6 @@
 
     "chat-log": true,
     "auto-reconnect": true,
-    "auto-recconect-delay": 5000
+    "auto-reconnect-delay": 5000
   }
 }

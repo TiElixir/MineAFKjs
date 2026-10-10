@@ -1,16 +1,17 @@
 {
-  "name": "Minecraft Afk Bot",
-  "version": "2.1",
-  "description": "Afk bot for minecraft servers.",
+  "name": "tielixir-minecraft-afk",
+  "version": "3.0.0",
+  "description": "A configurable Minecraft companion bot powered by Mineflayer.",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --check index.js && node --test"
   },
-  "author": "Lamgerr",
+  "author": "TiElixir",
   "license": "MIT",
   "dependencies": {
     "express": "^4.18.1",
+    "minecraft-data": "^3.70.0",
     "mineflayer": "^4.3.0",
     "mineflayer-pathfinder": "^2.1.1"
   }
